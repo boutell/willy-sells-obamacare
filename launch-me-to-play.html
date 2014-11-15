@@ -5,7 +5,7 @@
     <meta name="keywords" content="key, words">
     <meta name="description" content="description">
     <!-- <link rel="icon" href="favicon.ico" type="image/x-icon"> -->
-   <title>WILLY SELLS OBAMACARE</title>
+   <title>THE TEA PARTY SAVES AMERICA</title>
     <style type="text/css">
       .world {
         width: 100%;
@@ -60,8 +60,8 @@
   <script src="js/jquery-1.11.0.min.js"></script>
   <script src="js/request-animation-frame.js"></script>
   <div class="world">
-    <h1>WILLY SELLS OBAMACARE</h1>
-    <h2><div class="topic">POLICIES: <span class="policies">0</span></div><div class="topic">$<span class="points">0</span></div><div class="topic">LEVEL: <span class="level">1</span></div></h2>
+    <h1>THE TEA PARTY SAVES AMERICA</h1>
+    <h2><div class="topic">KOCH BROTHERS SATISFIED: <span class="policies">0</span></div><div class="topic">$<span class="points">0</span></div><div class="topic">LEVEL: <span class="level">1</span></div></h2>
     <h3><a class="try-again" href="#">START GAME</a></h3>
     <div class="obama happy-obama"><img src="images/happy-obama.png" /><h3>LEVEL <span class="level">level</span></h3></div>
     <div class="obama sad-obama"><img src="images/sad-obama.png" /></div>
@@ -96,8 +96,8 @@
       var $level = $('.level');
       var $playfield = $('.playfield');
       var $tryAgain = $('.try-again');
-      var $happyObama = $('.happy-obama');
-      var $sadObama = $('.sad-obama');
+      var $happyObama = $('.sad-obama');
+      var $sadObama = $('.happy-obama');
       var soundtrack = $('.soundtrack')[0];
       var boo = $('.boo')[0];
       var register = $('.register')[0];
@@ -180,7 +180,7 @@
 
         Sprite.call(self);
         self.type = 'salesman';
-        self.image('salesman');
+        self.image('teaPartier');
 
         var superStep = self.step;
         self.step = function(t) {
@@ -259,7 +259,7 @@
         self.targetX = playfield.width + 200;
         self.targetY = self.y + (Math.random() * 100 - 50);
 
-        self.image('teaPartier');
+        self.image('salesman');
 
         var superStep = self.step;
         self.step = function(t) {
