@@ -41,6 +41,19 @@
       .obama img {
         width: 400px;
       }
+      footer {
+        background-color: #ffb;
+        border-radius: 12px;
+        border: 1px solid #dd8;
+        padding: 12px;
+        position: absolute;
+        right: 40px;
+        top: 20px;
+      }
+      footer a {
+        color: black;
+        text-decoration: none;
+      }
     </style>
 </head>
 <body>
@@ -63,6 +76,9 @@
       <source src="audio/register.wav" type="audio/wav" />
     </audio>
   </div>
+  <footer>
+    <a href="https://github.com/boutell/willy-sells-obamacare">Open source!</a>
+  </footer>
   <script type="text/javascript">
     /* global $ */
     $(window).on('load', function() {
@@ -272,6 +288,9 @@
 
       var lastStep;
       var start;
+
+      // Main "do this one frame" step function for the game
+
       function step() {
         var now = getNow();
         var elapsed = (lastStep === undefined) ? 0 : (now - lastStep);
