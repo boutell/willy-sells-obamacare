@@ -8,4 +8,4 @@ The game is contained entirely in `launch-me-to-play.html`, plus the audio and i
 
 Released under the MIT license.
 
-You can [play the game here](http://www.boutell.com/boutell/willy-sells-obamacare).
+You can [play the game here](http://www.boutell.com/boutell/willy-sells-obamacare/launch-me-to-play.html).
