@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="utf-8">
+    <meta name="keywords" content="key, words">
+    <meta name="description" content="description">
+    <!-- <link rel="icon" href="favicon.ico" type="image/x-icon"> -->
+   <title>WILLY SELLS OBAMACARE</title>
+    <style type="text/css">
+      .world {
+        width: 100%;
+        background-color: white;
+        color: black;
+        font-family: Futura;
+      }
+      h1, h2, h3 {
+        text-align: center;
+      }
+      a {
+        color: #88f;
+      }
+      .playfield {
+        height: 600px;
+        position: relative;
+        overflow: hidden;
+      }
+      .topic {
+        margin-left: 40px;
+        margin-right: 40px;
+        display: inline-block;
+      }
+      .sound {
+        visibility: hidden;
+      }
+      .obama {
+        width: 100%;
+        text-align: center;
+        position: absolute;
+        display: none;
+      }
+      .obama img {
+        width: 400px;
+      }
+    </style>
+</head>
+<body>
+  <script src="js/jquery-1.11.0.min.js"></script>
+  <script src="js/request-animation-frame.js"></script>
+  <div class="world">
+    <h1>WILLY SELLS OBAMACARE</h1>
+    <h2><div class="topic">POLICIES: <span class="policies">0</span></div><div class="topic">$<span class="points">0</span></div><div class="topic">LEVEL: <span class="level">1</span></div></h2>
+    <h3><a class="try-again" href="#">START GAME</a></h3>
+    <div class="obama happy-obama"><img src="images/happy-obama.png" /><h3>LEVEL <span class="level">level</span></h3></div>
+    <div class="obama sad-obama"><img src="images/sad-obama.png" /></div>
+    <div class="playfield"></div>
+    <audio class="sound soundtrack">
+      <source src="audio/Rolemusic_-_01_-_Bacterial_Love.mp3" type="audio/mp3" />
+    </audio>
+    <audio class="sound boo">
+      <source src="audio/boo.wav" type="audio/wav" />
+    </audio>
+    <audio class="sound register">
+      <source src="audio/register.wav" type="audio/wav" />
+    </audio>
+  </div>
+  <script type="text/javascript">
+    /* global $ */
+    $(window).on('load', function() {
+      var images = {};
+      var sprites = {};
+      var nextId = 0;
+      var points = 0;
+      var policies = 0;
+      var level = 1;
+      var salesman;
+
+      var $world = $('.world');
+      var $points = $('.points');
+      var $policies = $('.policies');
+      var $level = $('.level');
+      var $playfield = $('.playfield');
+      var $tryAgain = $('.try-again');
+      var $happyObama = $('.happy-obama');
+      var $sadObama = $('.sad-obama');
+      var soundtrack = $('.soundtrack')[0];
+      var boo = $('.boo')[0];
+      var register = $('.register')[0];
+
+      var playfield = {
+        $el: $playfield,
+        width: $playfield.width(),
+        height: $playfield.height()
+      };
+
+      function Sprite() {
+        var self = this;
+
+        self.id = 's' + (nextId++);
+        self.x = playfield.width / 2;
+        self.y = playfield.height / 2;
+        self.speed = 240 + Math.random() * level * 100;
+        sprites[self.id] = self;
+
+        self.move = function(x, y) {
+          self.x = x;
+          self.y = y;
+          self.reflect();
+        };
+
+        self.reflect = function() {
+          if (self.$el) {
+            self.$el.css('top', self.y - self.$el[0].width / 2 + 'px');
+            self.$el.css('left', self.x - self.$el[0].height / 2 + 'px');
+          }
+        };
+
+        self.image = function(name) {
+          if (!images[name]) {
+            images[name] = $('<img />');
+            images[name].attr('src', 'images/' + name + '.png');
+          }
+          self.$el = images[name].clone();
+          self.$el.css('position', 'absolute');
+          self.reflect();
+          $playfield.append(self.$el);
+        };
+
+        self.hide = function() {
+          if (self.$el) {
+            self.$el.remove();
+            delete self.$el;
+          }
+        };
+
+        self.step = function(t) {
+          if (self.dying) {
+            return;
+          }
+          if ((self.targetX !== undefined) && (self.targetY !== undefined)) {
+            var dist = Math.sqrt((self.targetX - self.x) * (self.targetX - self.x) + (self.targetY - self.y) * (self.targetY - self.y));
+            if (dist <= self.speed * t) {
+              self.x = self.targetX;
+              self.y = self.targetY;
+            } else {
+              self.x += (self.targetX - self.x) * (self.speed * t / dist);
+              self.y += (self.targetY - self.y) * (self.speed * t / dist);
+            }
+          }
+          self.reflect();
+        };
+
+        self.distance = function(other) {
+          return Math.sqrt((self.x - other.x) * (self.x - other.x) + (self.y - other.y) * (self.y - other.y));
+        };
+
+        self.destroy = function() {
+          self.hide();
+          self.dying = true;
+        };
+      }
+
+      function Salesman() {
+        var self = this;
+
+        Sprite.call(self);
+        self.type = 'salesman';
+        self.image('salesman');
+
+        var superStep = self.step;
+        self.step = function(t) {
+          var id;
+
+          for (id in sprites) {
+            checkCollision(id);
+          }
+
+          function checkCollision(id) {
+
+            var sprite = sprites[id];
+
+            if (sprite.distance(salesman) < 50) {
+              if (sprite.type === 'patient') {
+                register.currentTime = 0;
+                register.play();
+                addScore(1, sprite.points, 0);
+                sprite.destroy();
+              } else if (sprite.type === 'teaPartier') {
+                boo.play();
+                salesman.destroy();
+                $tryAgain.text('TRY AGAIN');
+                $tryAgain.css('visibility', 'visible');
+                $sadObama.show();
+                setTimeout(function() {
+                  $sadObama.hide();
+                }, 5000);
+                soundtrack.pause();
+                soundtrack.currentTime = 0;
+                return;
+              }
+            }
+          }
+          superStep(t);
+        };
+      }
+
+      function Patient() {
+        var self = this;
+        Sprite.call(self);
+        self.type = 'patient';
+        self.x = -100;
+        self.y = Math.random() * playfield.height + 50;
+        self.targetX = playfield.width + 200;
+        self.targetY = self.y + (Math.random() * 100 - 50);
+        self.flavor = pick([ 'skater', 'wheelchair', 'oldLady', 'jogger', 'mom' ]);
+        self.points = {
+          skater: 1000,
+          wheelchair: 1000,
+          oldLady: 100,
+          jogger: 5000,
+          mom: 3000
+        }[self.flavor];
+
+        self.image(self.flavor);
+
+        var superStep = self.step;
+        self.step = function(t) {
+          if (Math.random() < 0.002 * level) {
+            self.targetY = self.y + Math.random() * 400 - 200;
+          }
+          superStep(t);
+          if (self.x > playfield.width + 100) {
+            self.destroy();
+          }
+        };
+      }
+
+      function TeaPartier() {
+        var self = this;
+        Sprite.call(self);
+        self.type = 'teaPartier';
+        self.x = -100;
+        self.y = Math.random() * playfield.height + 50;
+        self.targetX = playfield.width + 200;
+        self.targetY = self.y + (Math.random() * 100 - 50);
+
+        self.image('teaPartier');
+
+        var superStep = self.step;
+        self.step = function(t) {
+          superStep(t);
+          if (self.x > playfield.width + 100) {
+            self.destroy();
+          }
+        };
+      }
+
+      $playfield.on('mousemove', function(e) {
+        if (salesman) {
+          var x = e.pageX - $playfield.offset().left;
+          var y = e.pageY - $playfield.offset().top;
+          salesman.targetX = x;
+          salesman.targetY = y;
+        }
+      });
+
+      $tryAgain.on('click', function() {
+        reset();
+        return false;
+      });
+
+      requestAnimationFrame(step);
+
+      var lastStep;
+      var start;
+      function step() {
+        var now = getNow();
+        var elapsed = (lastStep === undefined) ? 0 : (now - lastStep);
+        elapsed /= 1000.0;
+        lastStep = now;
+        if (!start) {
+          start = now;
+        }
+        if (salesman) {
+          var levelShouldBe = 1 + ((now - start) / 30000);
+          if (levelShouldBe > level) {
+            addScore(0, 0, Math.floor(levelShouldBe - level));
+          }
+        }
+        var remove = [];
+        for (var id in sprites) {
+          var sprite = sprites[id];
+          sprite.step(elapsed);
+          if (sprite.dying) {
+            remove.push(sprite.id);
+          }
+        }
+        if (remove.length) {
+          var i;
+          for (i = 0; (i < remove.length); i++) {
+            delete sprites[remove[i]];
+          }
+        }
+
+        if (Math.random() < 0.05) {
+          new Patient();
+        }
+
+        if (Math.random() < 0.002 + level * 0.002) {
+          new TeaPartier();
+        }
+
+        requestAnimationFrame(step);
+      }
+
+      function getNow() {
+        if (window.performance && window.performance.now) {
+          return window.performance.now();
+        }
+        if (Date.now) {
+          return Date.now();
+        }
+        return (new Date()).getTime();
+      }
+
+      function pick(array) {
+        return array[Math.floor(Math.random() * array.length)];
+      }
+
+      function addScore(_policies, _points, _level) {
+        policies += _policies;
+        points += _points;
+        level += _level;
+        if (_level > 0) {
+          $happyObama.show();
+          setTimeout(function() {
+            $happyObama.hide();
+          }, 1000);
+        }
+        $policies.text(policies);
+        $points.text(points);
+        $level.text(level);
+      }
+
+      function reset() {
+        goFullScreen();
+        $playfield.height($world.height() - $playfield.offset().top);
+        playfield.width = $playfield.width();
+        playfield.height = $playfield.height();
+        start = getNow();
+        lastStep = start;
+        level = 1;
+        points = 0;
+        policies = 0;
+        for (var id in sprites) {
+          sprites[id].destroy();
+        }
+        sprites = {};
+        addScore(0, 0, 0);
+        salesman = new Salesman();
+        $tryAgain.css('visibility', 'hidden');
+        soundtrack.volume = 0.3;
+        soundtrack.play();
+      }
+
+      function goFullScreen() {
+        var html = $world[0];
+        if (html.requestFullscreen) {
+          html.requestFullscreen();
+        } else if (html.msRequestFullscreen) {
+          html.msRequestFullscreen();
+        } else if (html.mozRequestFullScreen) {
+          html.mozRequestFullScreen();
+        } else if (html.webkitRequestFullscreen) {
+          html.webkitRequestFullscreen();
+        } else {
+          // Play in window
+        }
+      }
+    });
+  </script>
+</body>
+</html>
