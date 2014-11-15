@@ -1,4 +1,6 @@
-All files in the `audio` and `images` folders are the property of their respective creators and were found to be available under a suitable Creative Commons license. The remainder of this file applies to the source code of the game.
+Music is [Bacterial Love by Rolemusic](http://freemusicarchive.org/music/Rolemusic/) (creative commons licensed).
+
+All files in the `audio` and `images` folders are the property of their respective creators and were found to be available under a suitable Creative Commons license or were public domain. The remainder of this file applies to the source code of the game.
 
 The MIT License (MIT)
 
